@@ -9,11 +9,13 @@ public class PlayerMovement : MonoBehaviour
     [Header("Movement")]
     public Rigidbody rb;
 
-    public float forwardForce = 6f;
     public float jumpHeight = 10;
     public bool grounded;
 
-    public float moveSpeed = 6f;
+    public float movementMultiplier = 6f;
+    public float moveSpeed = 3f;
+
+    float rbDrag = 6f;
 
     float horizontalMovement;
     float verticalMovement;
@@ -35,6 +37,7 @@ public class PlayerMovement : MonoBehaviour
     private void Update()
     {
         MyInput();
+        ControlDrag();
     }
 
     void MyInput()
@@ -44,6 +47,11 @@ public class PlayerMovement : MonoBehaviour
 
         moveDirection = transform.forward * verticalMovement + transform.right * horizontalMovement;
 
+    }
+
+    void ControlDrag()
+    {
+        rb.drag = rbDrag;
     }
 
     // Update is called once per frame
@@ -85,7 +93,7 @@ public class PlayerMovement : MonoBehaviour
 
     void MovePlayer()
     {
-        rb.AddForce(moveDirection.normalized * moveSpeed, ForceMode.Acceleration);
+        rb.AddForce(moveDirection.normalized * moveSpeed * movementMultiplier, ForceMode.Acceleration);
     }
 
     public void OnCollisionEnter(Collision collision)
