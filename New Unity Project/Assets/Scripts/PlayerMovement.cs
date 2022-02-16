@@ -2,27 +2,37 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-//TODO Add Drag https://www.youtube.com/watch?v=LqnPeqoJRFY
-
+//TODO handle slopes, try to fix jump
+//mess with the second parameter in the checksphere new Vector to fix
 public class PlayerMovement : MonoBehaviour
 {
+    //float playerheight = 2f;
+
+    [SerializeField] Transform orientation;
+
     [Header("Movement")]
     public Rigidbody rb;
 
-    public float jumpHeight = 10;
+    public float jumpHeight = 15f;
     public bool grounded;
+    float groundDistance = 0.000000000000000000000001f;
+    [SerializeField] LayerMask groundMask;
 
     public float movementMultiplier = 6f;
     public float moveSpeed = 3f;
 
-    float rbDrag = 6f;
+    [SerializeField] float airMultiplier = 0.222f;
+
+    [Header("Drag")]
+    float groundDrag = 5.7f;
+    float airDrag = 1.65f;
 
     float horizontalMovement;
     float verticalMovement;
 
     Vector3 moveDirection;
 
-    public int maxJumpCount = 2;
+    public int maxJumpCount = 1;
     public int currJumps = 0;
 
     // Start is called before the first frame update
@@ -36,8 +46,26 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
+
+        grounded = Physics.CheckSphere(transform.position - new Vector3(0, 0.04f, 0), groundDistance, groundMask);
+
+        print(grounded);
+
         MyInput();
         ControlDrag();
+        MovePlayer();
+
+        if ((Input.GetKeyDown("space")) && (currJumps > 0)) //player moves upward when they press space and they have jumps remaining
+        {
+            rb.drag = airDrag;
+            rb.AddForce(transform.up * jumpHeight, ForceMode.Impulse);
+            currJumps -= 1; //subtract one jump from amount of jumps able to be done
+        }
+
+        if (grounded)
+        {
+            currJumps = maxJumpCount;
+        }
     }
 
     void MyInput()
@@ -45,20 +73,27 @@ public class PlayerMovement : MonoBehaviour
         horizontalMovement = Input.GetAxisRaw("Horizontal");
         verticalMovement = Input.GetAxisRaw("Vertical");
 
-        moveDirection = transform.forward * verticalMovement + transform.right * horizontalMovement;
+        moveDirection = orientation.forward * verticalMovement + orientation.right * horizontalMovement;
 
     }
 
     void ControlDrag()
     {
-        rb.drag = rbDrag;
+        if (grounded)
+        {
+            rb.drag = groundDrag;
+        }
+        else
+        {
+            rb.drag = airDrag;
+        }
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
 
-        MovePlayer();
+        
 
         //      if (Input.GetKey("w"))
         //    {
@@ -80,11 +115,7 @@ public class PlayerMovement : MonoBehaviour
         // rb.AddForce(1800f * Time.deltaTime, 0, 0);
         // }
 
-        if ((Input.GetKeyDown("space")) && (currJumps > 0)) //player moves upward when they press space and they have jumps remaining
-        {
-            rb.AddForce(Vector3.up * jumpHeight, ForceMode.Impulse);
-            currJumps -= 1; //subtract one jump from amount of jumps able to be done
-        }
+        
 
         
     }
@@ -93,27 +124,35 @@ public class PlayerMovement : MonoBehaviour
 
     void MovePlayer()
     {
-        rb.AddForce(moveDirection.normalized * moveSpeed * movementMultiplier, ForceMode.Acceleration);
-    }
-
-    public void OnCollisionEnter(Collision collision)
-    {
-        if (collision.gameObject.tag == "Ground")
+        if (grounded)
         {
-            grounded = true;
-            currJumps = maxJumpCount; //reset number of jumps remaining
-
+            rb.AddForce(moveDirection.normalized * moveSpeed * movementMultiplier, ForceMode.Acceleration);
         }
-
-    }
-
-    public void OnCollisionExit(Collision collision)
-    {
-        if (collision.gameObject.tag == "Ground")
+        else
         {
-            grounded = false;
-
+            rb.AddForce(moveDirection.normalized * moveSpeed * movementMultiplier * airMultiplier, ForceMode.Acceleration);
         }
-
+        
     }
+
+    //public void OnCollisionEnter(Collision collision)
+    //{
+     //   if (collision.gameObject.tag == "Ground")
+       // {
+         //   grounded = true;
+           // currJumps = maxJumpCount; //reset number of jumps remaining
+
+       // }
+
+//    }
+
+  //  public void OnCollisionExit(Collision collision)
+    //{
+     //   if (collision.gameObject.tag == "Ground")
+      //  {
+       //     grounded = false;
+
+        //}
+
+    //}
 }
