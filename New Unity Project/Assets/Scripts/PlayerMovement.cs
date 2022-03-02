@@ -42,6 +42,8 @@ public class PlayerMovement : MonoBehaviour
     public int maxJumpCount = 1;
     public int currJumps = 0;
 
+    //private WallRun wallRun = new WallRun();// = GetComponentInParent(WallRun)
+
     public Rigidbody rb;
 
     RaycastHit slopeHit;
