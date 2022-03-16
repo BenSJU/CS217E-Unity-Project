@@ -2,8 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-//TODO handle slopes, try to fix jump
-//mess with the second parameter in the checksphere new Vector to fix
+//Thinks that theres like constantly a wall to left/right if spam space to jump? Need to fix, probably add some condition to the raycast or something.
 public class PlayerMovement : MonoBehaviour
 {
     float playerHeight = 1f;
@@ -42,6 +41,15 @@ public class PlayerMovement : MonoBehaviour
     public int maxJumpCount = 1;
     public int currJumps = 0;
 
+    [Header("Wall Detection")]
+    [SerializeField] float wallDistance = .5f;
+
+    public bool wallLeft = false;
+    public bool wallRight = false;
+
+    RaycastHit leftWallHit;
+    RaycastHit rightWallHit;
+
     //private WallRun wallRun = new WallRun();// = GetComponentInParent(WallRun)
 
     public Rigidbody rb;
@@ -79,12 +87,13 @@ public class PlayerMovement : MonoBehaviour
 
         grounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
 
-        print(grounded);
+        //print(grounded);
 
         MyInput();
         ControlDrag();
         ControlSpeed();
         MovePlayer();
+        CheckWall();
 
         if ((Input.GetKeyDown("space")) && (currJumps > 0)) //player moves upward when they press space and they have jumps remaining
         {
@@ -95,6 +104,11 @@ public class PlayerMovement : MonoBehaviour
         {
             currJumps = maxJumpCount;
         }
+        else if (wallLeft || wallRight)
+        {
+            currJumps = 2;
+        }
+        
 
         slopeMoveDirection = Vector3.ProjectOnPlane(moveDirection, slopeHit.normal);
     }
@@ -113,6 +127,13 @@ public class PlayerMovement : MonoBehaviour
         rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
         rb.AddForce(transform.up * jumpHeight, ForceMode.Impulse);
         currJumps -= 1;
+    }
+
+    void CheckWall()
+    {
+        wallLeft = Physics.Raycast(transform.position, -orientation.right, out leftWallHit, wallDistance);
+
+        wallRight = Physics.Raycast(transform.position, orientation.right, out rightWallHit, wallDistance);
     }
 
     void ControlSpeed()
