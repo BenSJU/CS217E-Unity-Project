@@ -6,13 +6,34 @@ using UnityEngine;
 public class Weapon : MonoBehaviour
 {
     [Header("References")]
-    [SerializeField] WeaponData weaponData;
+    [SerializeField] private WeaponData weaponData;
+    [SerializeField] private Transform muzzle;
 
     float timeSinceLastShot;
 
     private void Start()
     {
         PlayerShoot.shootInput += Shoot;
+        PlayerShoot.reloadInput += StartReload;
+    }
+
+    public void StartReload()
+    {
+        if (!weaponData.reloading)
+        {
+            StartCoroutine(Reload());
+        }
+    }
+    
+    private IEnumerator Reload()
+    {
+        weaponData.reloading = true;
+
+        yield return new WaitForSeconds(weaponData.reloadTime);
+
+        weaponData.currentAmmo = weaponData.magSize;
+
+        weaponData.reloading = false;
     }
 
     private bool CanShoot() => !weaponData.reloading && timeSinceLastShot > 1f / (weaponData.fireRate / 60f);
@@ -23,9 +44,10 @@ public class Weapon : MonoBehaviour
         {
             if (CanShoot())
             {
-                if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hitInfo, weaponData.range))
+                if (Physics.Raycast(muzzle.position, transform.forward, out RaycastHit hitInfo, weaponData.range))
                 {
-                    Debug.Log(hitInfo.transform.name);
+                    IDamageable damageable = hitInfo.transform.GetComponent<IDamageable>();
+                    damageable?.Damage(weaponData.damage);
                 }
 
                 weaponData.currentAmmo--;
