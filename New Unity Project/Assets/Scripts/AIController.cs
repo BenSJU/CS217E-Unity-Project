@@ -35,12 +35,58 @@ public class AIController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        m_PlayerPosition = Vector3.zero;
+        m_IsPatrol = true;
+        m_CaughtPlayer = false;
+        m_PlayerInRange = false;
+        m_WaitTime = startWaitTime;
+        m_TimeToRotate = timeToRotate;
+
+        m_CurrentWaypointIndex = 0;
+        navMeshAgent = GetComponent<NavMeshAgent>();
+
+        navMeshAgent.isStopped = false;
+        navMeshAgent.speed = speedWalk;
+        navMeshAgent.SetDestination(waypoints[m_CurrentWaypointIndex].position);
     }
 
     // Update is called once per frame
     void Update()
     {
         
+    }
+
+    void Move(float speed)
+    {
+        navMeshAgent.isStopeed = false;
+        navMeshAgent.speed = speed;
+    }
+
+    void Caught_Player()
+    {
+        m_CaughtPlayer = true;
+    }
+
+    void LookingPlayer(Vector3 player)
+    {
+        navMeshAgent.SetDestinaion(player);
+        
+        if (Vector3.Distance(transform.position, player) <= 0.3)
+        {
+            if (m_WaitTime <= 0)
+            {
+                m_PlayerNear = false;
+                Move(speedWalk);
+                navMeshAgent.SetDestination(waypoints[m_CurrentWaypointIndex].position);
+                m_WaitTime = startWaitTime;
+                m_TimeToRotate = timeToRotate;
+            }
+            else
+            {
+                Stop();
+                m_WaitTime -= time.deltaTime;
+                //CONTINUE FROM HERE
+            }
+        }
     }
 }

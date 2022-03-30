@@ -22,12 +22,40 @@ public class WallRun : MonoBehaviour
     RaycastHit leftWallHit;
     RaycastHit rightWallHit;
 
+    
+
     private Rigidbody rb;
     
     bool CanWallRun()
     {
-        return !Physics.Raycast(transform.position, Vector3.down, minimumJumpHeight);
+        return !(Physics.Raycast(transform.position, Vector3.down, minimumJumpHeight)) && CantEnemyWallRun();
     }
+
+    bool CantEnemyWallRun()
+    {
+
+        //Raycast to check if the object being wallrun against is an enemy
+        Ray ray = new Ray(transform.position, Vector3.up);
+        //RaycastHit hit;
+
+        if (wallLeft)
+        {
+            if ((leftWallHit.transform.gameObject.CompareTag("Enemy"))) //|| (rightWallHit.transform.gameObject.CompareTag("Enemy")))
+            {
+                return false;
+            }
+        }
+        else if (wallRight)
+        {
+            if (rightWallHit.transform.gameObject.CompareTag("Enemy"))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
 
     private void Start()
     {
