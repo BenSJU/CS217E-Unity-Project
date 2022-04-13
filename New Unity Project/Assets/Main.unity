@@ -597,7 +597,7 @@ GameObject:
   - component: {fileID: 359369652}
   m_Layer: 0
   m_Name: Capsule
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2049,6 +2049,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b0f17913ce6186e419acb6c2fc17d579, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  wallRun: {fileID: 2046911234}
   sensX: 400
   sensY: 400
   cam: {fileID: 411717822}
@@ -2070,6 +2071,12 @@ MonoBehaviour:
   minimumJumpHeight: 1.5
   wallRunGravity: 0
   wallRunJumpForce: 0
+  cam: {fileID: 907793045}
+  fov: 90
+  wallRunfov: 110
+  wallRunfovTime: 20
+  camTilt: 0
+  camTiltTime: 0
   wallLeft: 0
   wallRight: 0
 --- !u!114 &2046911235
