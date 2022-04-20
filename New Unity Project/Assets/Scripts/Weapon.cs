@@ -2,12 +2,14 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Weapon : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private WeaponData weaponData;
     [SerializeField] private Transform muzzle;
+    [SerializeField] public Text ammoDisplay;
 
     float timeSinceLastShot;
 
@@ -59,6 +61,7 @@ public class Weapon : MonoBehaviour
 
     private void Update()
     {
+        ammoDisplay.text = weaponData.currentAmmo.ToString();
         timeSinceLastShot += Time.deltaTime;
     }
 
